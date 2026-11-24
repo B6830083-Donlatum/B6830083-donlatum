@@ -31,6 +31,19 @@ All numbers below were read from the live page or from ngspice output produced i
 
 Keyboard behaviour was checked in Chromium: when a tab has focus, `ArrowRight` from B8 wraps to B1, and `Home` / `End` / `ArrowLeft` move as expected. Only one panel is visible at a time, and `aria-selected` / `tabindex` follow the active tab.
 
+## Screen-target layout (three-column workbench)
+
+The simulator page follows the handout's `02 / SCREEN TARGET` wireframe: a left **Circuit & Parameters** column with an electrically connected CE voltage-divider schematic and all inputs, a middle **Simulation & Plots** column with a DC / AC / Transient segmented control and the real SVG traces, and a right **Engineering Results** column with engine/analysis/status, model provenance, numeric summaries and the separate Lab 03 analytical reference. The eight acceptance tabs remain below the workbench, unchanged.
+
+Layout was checked with the built-in browser tool at desktop and in a 390 CSS px iframe viewport:
+
+- Desktop computed grid: `320px 516px 280px`, no horizontal page overflow.
+- 390 px viewport: `.workbench` collapses to one `339px` column, `.grid` fields to one `307px` column, no horizontal page overflow.
+- The segmented control is a real radio group in the same form; POST `/simulate` with `analysis=ac` still returned HTTP 200 with `Status: Success`, AC plots, peak-gain table, netlist and run log.
+- No illustrative/fake traces were added: the empty state explicitly says that plots come from the current ngspice run.
+
+Impeccable `shot` captures: `captures/wireframe_workbench_1440x900.png` and `captures/wireframe_workbench_390x844.png`.
+
 ## Impeccable UI review
 
 Impeccable `detect --json templates/simulator.html templates/index.html` reported:

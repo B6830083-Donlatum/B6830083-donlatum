@@ -69,6 +69,41 @@
       border-radius: 8px; padding: 10px 14px; margin-top: 12px; }
     footer { color: var(--muted); font-size: .82rem; text-align: center; }
 
+    /* Three-column workbench: circuit / plots / results (screen target). */
+    .workbench { display: grid; align-items: start; gap: 14px;
+      grid-template-columns: minmax(270px, 320px) minmax(0, 1fr) minmax(240px, 280px); }
+    .panel { min-width: 0; background: var(--card); border: 1px solid var(--line);
+      border-radius: 12px; padding: 18px; box-shadow: 0 8px 24px rgba(16,54,88,.06); }
+    .panel > h2, .panel-head h2 { font-size: 1.25rem; margin: 0 0 12px; }
+    .panel-head { display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+      justify-content: space-between; margin-bottom: 12px; }
+    .panel-head h2 { margin: 0; }
+    .panel .notice { margin: 0 0 12px; font-size: .84rem; }
+    .circuit { margin: 0 0 12px; border: 1px solid var(--line); border-radius: 8px;
+      background: #f6fafc; padding: 10px; }
+    .circuit svg { width: 100%; height: auto; display: block; }
+    .circuit figcaption { color: var(--muted); font-size: .76rem; margin-top: 6px; }
+    fieldset.segmented { margin: 0; min-width: 0; }
+    .segmented { display: inline-flex; gap: 3px; padding: 3px; border: 1px solid var(--line);
+      border-radius: 8px; background: #f6fafc; }
+    .segmented input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+    .segmented label { display: inline-block; padding: 5px 11px; border-radius: 5px;
+      font-size: .82rem; font-weight: 700; color: var(--navy); cursor: pointer; }
+    .segmented label:hover { background: #e6eff7; }
+    .segmented input:checked + label { background: var(--teal); color: #fff; }
+    .segmented input:focus-visible + label { outline: 2px solid var(--navy); outline-offset: 2px; }
+    .mode-caption { display: block; color: var(--muted); font-size: .74rem; margin-bottom: 6px; }
+    .plot-stack { display: grid; gap: 12px; }
+    .empty { border: 1px dashed #a9c4d4; border-radius: 8px; background: #fbfdff;
+      color: var(--muted); padding: 20px; font-size: .88rem; }
+    .result-meta { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px; }
+    .result-meta .badge { margin: 0; }
+    .panel-right h3 { margin: 14px 0 6px; font-size: .9rem; }
+    .panel-right table { font-size: .84rem; }
+    .panel-right th { width: 46%; }
+    .panel details { margin-top: 10px; }
+    .fixture-line { color: var(--muted); font-size: .78rem; margin: 0 0 8px; }
+
     /* Browser acceptance: eight explicit cases, one per tab. */
     .tablist { display: flex; gap: 6px; overflow-x: auto; padding: 4px 2px 10px;
       border-bottom: 1px solid var(--line); }
@@ -86,11 +121,18 @@
       background: #fff; display: block; }
     .evidence figcaption { color: var(--muted); font-size: .78rem; margin-top: 6px; }
     .evidence p, .evidence li { font-size: .88rem; }
+    @media (max-width: 1080px) {
+      .workbench { grid-template-columns: minmax(260px, 320px) minmax(0, 1fr); }
+      .panel-right { grid-column: 1 / -1; }
+    }
     @media (max-width: 760px) {
       header { padding: 18px 0 16px; }
       .card { padding: 15px; }
       .grid { grid-template-columns: 1fr; }
       .evidence { grid-template-columns: 1fr; }
+      .workbench { grid-template-columns: 1fr; }
+      .panel-right { grid-column: auto; }
+      .panel { padding: 15px; }
     }
   </style>
 </head>
@@ -111,23 +153,57 @@
     <a href="{{ url_for('simulator', analysis='tran') }}">Transient</a>
   </nav>
 
-  <section class="card">
-    <h2>1 · Circuit &amp; parameters</h2>
-    <div class="notice">
-      Reference fixture: VCC 12 V · R1 100 kΩ · R2 22 kΩ · RC 2.2 kΩ · RE 1 kΩ ·
-      RL 10 kΩ · Cin = Cout = 10 µF · source 10 mV peak / 1 kHz.
-      RE is <strong>not bypassed</strong> in this baseline.
-    </div>
-    <form method="post" action="{{ url_for('simulate') }}">
+  <form id="sim-form" method="post" action="{{ url_for('simulate') }}">
+  <div class="workbench">
+    <section class="panel panel-left" aria-labelledby="params-title">
+      <h2 id="params-title">Circuit &amp; parameters</h2>
+      <figure class="circuit">
+        <svg viewBox="0 0 470 294" xmlns="http://www.w3.org/2000/svg" role="img"
+             aria-labelledby="ce-title ce-desc">
+          <title id="ce-title">Common-emitter amplifier with voltage-divider bias</title>
+          <desc id="ce-desc">VCC feeds R1 and RC. R1 and R2 meet at the base of Q1.
+            RC feeds the collector, RE connects the emitter to ground, Cin and Cout couple
+            the source and RL, and all grounds are shared.</desc>
+          <g fill="none" stroke="#3b6377" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M151 28H310 M151 28V64 M151 108V180 M310 28V64 M310 108V145"/>
+            <rect x="144" y="64" width="14" height="44" fill="#fff"/>
+            <rect x="303" y="64" width="14" height="44" fill="#fff"/>
+            <circle cx="278" cy="183" r="41" fill="#fff"/>
+            <path d="M151 180H260 M260 164V202 M260 172L299 145H310 M260 195L300 220H310V236"/>
+            <path d="M282 207L300 220 M292 217L296 208L302 222Z" fill="#3b6377" stroke-width="1.4"/>
+            <rect x="303" y="236" width="14" height="23" fill="#fff"/>
+            <path d="M310 259V278"/>
+            <path d="M151 180V207"/>
+            <rect x="144" y="207" width="14" height="37" fill="#fff"/>
+            <path d="M151 244V278"/>
+            <path d="M43 180H82 M93 180H151 M43 180V207 M43 237V278"/>
+            <path d="M82 165V195 M93 165V195"/>
+            <circle cx="43" cy="222" r="15" fill="#fff"/>
+            <path d="M33 223Q38 216 43 223T53 223" stroke-width="1.6"/>
+            <path d="M310 145H360 M371 145H414V190"/>
+            <path d="M360 130V160 M371 130V160"/>
+            <rect x="407" y="190" width="14" height="51" fill="#fff"/>
+            <path d="M414 241V278"/>
+            <path d="M43 278H414 M222 278V285 M211 285H233 M215 290H229" stroke-width="2"/>
+          </g>
+          <g fill="#254d67" font-family="Tahoma,Arial,sans-serif">
+            <text x="231" y="17" text-anchor="middle" font-size="17" font-weight="700">+VCC</text>
+            <text x="164" y="91" font-size="15">R1</text><text x="323" y="91" font-size="15">RC</text>
+            <text x="164" y="230" font-size="15">R2</text><text x="323" y="253" font-size="15">RE</text>
+            <text x="242" y="246" font-size="16" font-weight="700">Q1 NPN</text>
+            <text x="81" y="155" font-size="14" text-anchor="middle">Cin</text>
+            <text x="353" y="119" font-size="14" text-anchor="middle">Cout</text>
+            <text x="426" y="216" font-size="15">RL</text>
+            <text x="414" y="131" font-size="15">Vout</text>
+            <text x="8" y="245" font-size="14">Vin</text>
+            <text x="223" y="270" font-size="13">GND</text>
+          </g>
+          <g fill="#07766e"><circle cx="151" cy="180" r="4"/><circle cx="310" cy="145" r="4"/></g>
+        </svg>
+        <figcaption>CE voltage-divider · NPN Q1 · RE ไม่ถูก bypass · ค่าที่ใช้คือค่ในฟอร์มด้านล่าง</figcaption>
+      </figure>
+      <p class="fixture-line">ตัวเลขในวงจรอ้างอิง: VCC 12 V · R1 100 kΩ · R2 22 kΩ · RC 2.2 kΩ · RE 1 kΩ · RL 10 kΩ · Cin/Cout 10 µF · 10 mV / 1 kHz</p>
       <div class="grid">
-        <div>
-          <label for="analysis">Analysis mode</label>
-          <select id="analysis" name="analysis">
-            {% for key, label in analysis_labels.items() %}
-            <option value="{{ key }}" {% if analysis == key %}selected{% endif %}>{{ label }}</option>
-            {% endfor %}
-          </select>
-        </div>
         <div>
           <label for="vcc">VCC (V)</label>
           <input id="vcc" name="vcc" type="number" step="any" value="{{ form.get('vcc', '') }}" required>
@@ -178,87 +254,119 @@
       </div>
       <div class="actions">
         <button type="submit">Run Simulation</button>
-        <span class="hint">ทุกกราฟ/ตัวเลขด้านล่างมาจากการรัน ngspice จริงในรอบนี้ ไม่ใช่ค่าที่ฝังไว้ในโค้ด</span>
+        <span class="hint">กราฟ/ตัวเลขมาจาก ngspice จริงในรอบนี้</span>
       </div>
-    </form>
+    </section>
 
-    {% if error %}
-    <div class="error"><strong>Error:</strong> {{ error }}</div>
-    {% if spice_log %}
-    <details><summary>ngspice log (error)</summary><pre>{{ spice_log }}</pre></details>
-    {% endif %}
-    {% endif %}
-  </section>
-
-  {% if result %}
-  <section class="card">
-    <h2>2 · Simulation results</h2>
-    <span class="badge engine">Engine: {{ result.engine }}</span>
-    <span class="badge analysis">Analysis: {{ analysis_labels.get(result.analysis, result.analysis) }}</span>
-    <span class="badge engine">Status: Success</span>
-
-    <div class="notice"><strong>Provenance:</strong> {{ result.model }}</div>
-
-    {% if result.analysis == 'dc' %}
-      <h3>DC operating point from ngspice <code>.op</code></h3>
-      <table>
-        <tbody>
-          <tr><th>VB (V)</th><td>{{ '%.5f'|format(result.values.vb) }}</td></tr>
-          <tr><th>VE (V)</th><td>{{ '%.5f'|format(result.values.ve) }}</td></tr>
-          <tr><th>VC (V)</th><td>{{ '%.5f'|format(result.values.vc) }}</td></tr>
-          <tr><th>VCE (V)</th><td>{{ '%.5f'|format(result.values.vce) }}</td></tr>
-          <tr><th>IC (A)</th><td>{{ '%.6g'|format(result.values.ic) }} A
-            ({{ '%.4f'|format(result.values.ic * 1000) }} mA)</td></tr>
-        </tbody>
-      </table>
-
-      {% if analytical %}
-      <h3>Lab 03 analytical reference <span class="hint">(constant β / VBE — different model assumptions)</span></h3>
-      <table>
-        <tbody>
-          <tr><th>IC · analytical</th><td>{{ analytical.ic }}</td></tr>
-          <tr><th>VCE · analytical</th><td>{{ analytical.vce }}</td></tr>
-        </tbody>
-      </table>
+    <section class="panel panel-center" aria-labelledby="plots-title">
+      <div class="panel-head">
+        <h2 id="plots-title">Simulation &amp; Plots</h2>
+        <div>
+          <span class="mode-caption">Analysis mode</span>
+          <fieldset class="segmented" aria-label="Analysis mode">
+            <input type="radio" id="mode-dc" name="analysis" value="dc" {% if analysis == 'dc' %}checked{% endif %}>
+            <label for="mode-dc">DC</label>
+            <input type="radio" id="mode-ac" name="analysis" value="ac" {% if analysis == 'ac' %}checked{% endif %}>
+            <label for="mode-ac">AC</label>
+            <input type="radio" id="mode-tran" name="analysis" value="tran" {% if analysis == 'tran' %}checked{% endif %}>
+            <label for="mode-tran">Transient</label>
+          </fieldset>
+        </div>
+      </div>
+      {% if error %}
+      <div class="error"><strong>Error:</strong> {{ error }}</div>
+      {% if spice_log %}
+      <details><summary>ngspice log (error)</summary><pre>{{ spice_log }}</pre></details>
       {% endif %}
-    {% elif result.analysis == 'ac' %}
-      <h3>AC frequency response from ngspice <code>.ac</code></h3>
-      <div class="notice">Vin reference = source node <code>IN</code> before Cin; Vout = node <code>OUT</code> across RL.</div>
-      {{ charts.gain|safe }}
-      {{ charts.phase|safe }}
-      <p class="hint">Peak gain in sweep: {{ '%.2f'|format(result.values.gain_peak_db) }} dB</p>
-      {% if result.values.f_low_3db_hz %}
-      <p class="hint">Lower −3 dB (relative to peak): ≈ {{ '%.4g'|format(result.values.f_low_3db_hz) }} Hz</p>
       {% endif %}
-      {% if result.values.f_high_3db_hz %}
-      <p class="hint">Upper −3 dB (relative to peak): ≈ {{ '%.4g'|format(result.values.f_high_3db_hz) }} Hz</p>
+
+      {% if result %}
+      <div class="plot-stack">
+        {% if result.analysis == 'dc' %}
+          <div class="notice">DC operating point จาก <code>.op</code> — ไม่มี trace ตามเวลา/ความถี่ ตัวเลขอยู่ที่ Engineering Results</div>
+        {% elif result.analysis == 'ac' %}
+          <div class="notice">Vin reference = node <code>IN</code> ก่อน Cin · Vout = node <code>OUT</code> ที่ RL ·แกนความถี่เป็น log scale</div>
+          {{ charts.gain|safe }}
+          {{ charts.phase|safe }}
+        {% else %}
+          {{ charts.wave|safe }}
+        {% endif %}
+      </div>
+      <details><summary>Netlist sent to ngspice this run</summary><pre>{{ result.netlist }}</pre></details>
+      <details><summary>ngspice run log</summary><pre>{{ result.log }}</pre></details>
       {% else %}
-      <p class="hint">Upper −3 dB point not determined in sweep range (1 Hz – 10 MHz).</p>
+      <div class="empty">
+        เลือก DC / AC / Transient แล้วกด <strong>Run Simulation</strong> — กราฟจะถูกสร้างจากไฟล์ผลลัพธ์ของ ngspice ในรันนั้น
+        ไม่มี trace ตัวอย่างหรือค่าที่ฝังไว้ในหน้านี้
+      </div>
       {% endif %}
-    {% else %}
-      <h3>Transient waveforms from ngspice <code>.tran</code></h3>
-      {{ charts.wave|safe }}
-      <table>
-        <tbody>
-          <tr><th>Vin peak (V)</th><td>{{ '%.6g'|format(result.values.vin_peak_v) }}</td></tr>
-          <tr><th>Vout peak (V)</th><td>{{ '%.6g'|format(result.values.vout_peak_v) }}</td></tr>
-          <tr><th>|Vout/Vin| peak</th><td>{{ '%.4f'|format(result.values.gain_peak_abs) }}</td></tr>
-        </tbody>
-      </table>
-      <p class="hint">In a common-emitter stage with unbypassed RE, Vout should be approximately 180° out of phase with Vin.</p>
-    {% endif %}
+    </section>
 
-    {% if result.warnings %}
-    <div class="warnings">
-      <strong>⚠ Warnings</strong>
-      <ul>{% for warning in result.warnings %}<li>{{ warning }}</li>{% endfor %}</ul>
-    </div>
-    {% endif %}
+    <section class="panel panel-right" aria-labelledby="results-title">
+      <h2 id="results-title">Engineering Results</h2>
+      {% if result %}
+      <div class="result-meta">
+        <span class="badge engine">Engine: {{ result.engine }}</span>
+        <span class="badge analysis">Analysis: {{ analysis_labels.get(result.analysis, result.analysis) }}</span>
+        <span class="badge engine">Status: Success</span>
+      </div>
+      <div class="notice"><strong>Provenance:</strong> {{ result.model }}</div>
 
-    <details><summary>Netlist sent to ngspice this run</summary><pre>{{ result.netlist }}</pre></details>
-    <details><summary>ngspice run log</summary><pre>{{ result.log }}</pre></details>
-  </section>
-  {% endif %}
+      {% if result.analysis == 'dc' %}
+        <h3>DC operating point · ngspice <code>.op</code></h3>
+        <table>
+          <tbody>
+            <tr><th>VB (V)</th><td>{{ '%.5f'|format(result.values.vb) }}</td></tr>
+            <tr><th>VE (V)</th><td>{{ '%.5f'|format(result.values.ve) }}</td></tr>
+            <tr><th>VC (V)</th><td>{{ '%.5f'|format(result.values.vc) }}</td></tr>
+            <tr><th>VCE (V)</th><td>{{ '%.5f'|format(result.values.vce) }}</td></tr>
+            <tr><th>IC (A)</th><td>{{ '%.6g'|format(result.values.ic) }} A
+              ({{ '%.4f'|format(result.values.ic * 1000) }} mA)</td></tr>
+          </tbody>
+        </table>
+        {% if analytical %}
+        <h3>Lab 03 analytical reference</h3>
+        <table>
+          <tbody>
+            <tr><th>IC · analytical</th><td>{{ analytical.ic }}</td></tr>
+            <tr><th>VCE · analytical</th><td>{{ analytical.vce }}</td></tr>
+          </tbody>
+        </table>
+        <p class="hint">constant β / VBE — different model assumptions from SPICE</p>
+        {% endif %}
+      {% elif result.analysis == 'ac' %}
+        <h3>AC frequency response · ngspice <code>.ac</code></h3>
+        <table>
+          <tbody>
+            <tr><th>Peak gain (dB)</th><td>{{ '%.2f'|format(result.values.gain_peak_db) }}</td></tr>
+            <tr><th>Lower −3 dB (Hz)</th><td>{% if result.values.f_low_3db_hz %}≈ {{ '%.4g'|format(result.values.f_low_3db_hz) }}{% else %}not determined{% endif %}</td></tr>
+            <tr><th>Upper −3 dB (Hz)</th><td>{% if result.values.f_high_3db_hz %}≈ {{ '%.4g'|format(result.values.f_high_3db_hz) }}{% else %}not determined in sweep{% endif %}</td></tr>
+          </tbody>
+        </table>
+      {% else %}
+        <h3>Transient response · ngspice <code>.tran</code></h3>
+        <table>
+          <tbody>
+            <tr><th>Vin peak (V)</th><td>{{ '%.6g'|format(result.values.vin_peak_v) }}</td></tr>
+            <tr><th>Vout peak (V)</th><td>{{ '%.6g'|format(result.values.vout_peak_v) }}</td></tr>
+            <tr><th>|Vout/Vin| peak</th><td>{{ '%.4f'|format(result.values.gain_peak_abs) }}</td></tr>
+          </tbody>
+        </table>
+        <p class="hint">CE ที่ RE ไม่ถูก bypass ควรให้ Vout กลับเฟสกับ Vin ประมาณ 180°</p>
+      {% endif %}
+
+      {% if result.warnings %}
+      <div class="warnings">
+        <strong>⚠ Warnings</strong>
+        <ul>{% for warning in result.warnings %}<li>{{ warning }}</li>{% endfor %}</ul>
+      </div>
+      {% endif %}
+      {% else %}
+      <div class="empty">ยังไม่มีผลจำลองในหน้านี้ — กด <strong>Run Simulation</strong> เพื่อดูตัวเลข สถานะ และ provenance</div>
+      {% endif %}
+    </section>
+  </div>
+  </form>
 
   <section class="card" aria-labelledby="acceptance-title">
     <h2 id="acceptance-title">3 · Browser acceptance · B1–B8</h2>

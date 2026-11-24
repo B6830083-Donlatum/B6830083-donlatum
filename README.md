@@ -13,7 +13,7 @@ Lab 04 common-emitter amplifier simulator driven by **real ngspice runs**
 | `spice_engine.py` | Netlist builder + `subprocess.run` adapter + ngspice output parser |
 | `charts.py` | Dependency-free SVG plots drawn from parsed simulation arrays |
 | `templates/index.html` | Lab 03 form/results (unchanged behaviour, added link to Lab 04) |
-| `templates/simulator.html` | CE circuit parameters, analysis selector, status, provenance, plots and an 8-tab B1–B8 evidence panel |
+| `templates/simulator.html` | Three-column screen target (circuit/parameters · analysis/plots · results), provenance, plots and an 8-tab B1–B8 evidence panel |
 | `docs/validation.md` | A1–A5 (Lab 03) and B1–B8 (Lab 04) browser acceptance records |
 | `docs/captures/` | Browser screenshots used as evidence |
 | `AGENTS.md` | Rules for AI agents working on this repository |
