@@ -1,14 +1,12 @@
-"""Flask web app for Lab 02/03 BJT DC-bias calculator.
-
-Lab 02: Voltage Divider Bias
-Lab 03: adds Fixed Bias and Emitter Bias (single supply)
-"""
+"""Flask web app: Lab 02/03 DC bias + Lab 04 ngspice CE simulator."""
 
 from __future__ import annotations
 
+import re
+from pathlib import Path
 from typing import Any, Dict, List
 
-from flask import Flask, render_template, request
+from flask import Flask, abort, render_template, request, send_from_directory
 
 from charts import ac_charts, tran_charts
 from dc_bias import (
@@ -20,6 +18,7 @@ from dc_bias import (
 from spice_engine import SpiceError, run_simulation
 
 app = Flask(__name__)
+CAPTURE_DIR = Path(__file__).resolve().parent / "docs" / "captures"
 
 MODES = {
     "divider": {
@@ -355,6 +354,15 @@ def _sim_context(
         "charts": charts or {},
         "analytical": analytical,
     }
+
+
+@app.route("/capture/<path:name>")
+def capture(name: str):
+    """Serve recorded browser-evidence images for the B1–B8 tabs."""
+
+    if not re.fullmatch(r"[A-Za-z0-9_.-]+", name):
+        abort(404)
+    return send_from_directory(CAPTURE_DIR, name)
 
 
 @app.route("/simulator", methods=["GET"])

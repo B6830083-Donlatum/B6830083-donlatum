@@ -68,10 +68,29 @@
     .warnings { background: #fff4ea; border: 1px solid #e2b68f; color: #714321;
       border-radius: 8px; padding: 10px 14px; margin-top: 12px; }
     footer { color: var(--muted); font-size: .82rem; text-align: center; }
+
+    /* Browser acceptance: eight explicit cases, one per tab. */
+    .tablist { display: flex; gap: 6px; overflow-x: auto; padding: 4px 2px 10px;
+      border-bottom: 1px solid var(--line); }
+    .tab { flex: 0 0 auto; border: 1px solid var(--line); border-radius: 8px 8px 0 0;
+      background: #f8fbfe; color: var(--navy); padding: 8px 12px; font-size: .85rem;
+      font-weight: 750; cursor: pointer; }
+    .tab[aria-selected="true"] { background: var(--navy); border-color: var(--navy); color: #fff; }
+    .tab:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+    .tabpanel { padding: 16px 2px 0; }
+    .tabpanel[hidden] { display: none; }
+    .evidence { display: grid; grid-template-columns: minmax(0, 1fr) 280px;
+      gap: 18px; align-items: start; }
+    .evidence figure { margin: 0; }
+    .evidence img { width: 100%; border: 1px solid var(--line); border-radius: 8px;
+      background: #fff; display: block; }
+    .evidence figcaption { color: var(--muted); font-size: .78rem; margin-top: 6px; }
+    .evidence p, .evidence li { font-size: .88rem; }
     @media (max-width: 760px) {
       header { padding: 18px 0 16px; }
       .card { padding: 15px; }
       .grid { grid-template-columns: 1fr; }
+      .evidence { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -240,6 +259,243 @@
     <details><summary>ngspice run log</summary><pre>{{ result.log }}</pre></details>
   </section>
   {% endif %}
+
+  <section class="card" aria-labelledby="acceptance-title">
+    <h2 id="acceptance-title">3 · Browser acceptance · B1–B8</h2>
+    <div class="notice">
+      ผลด้านล่างเป็น <strong>recorded evidence จาก browser run จริง</strong> ไม่ใช่ผลรันปัจจุบันของฟอร์มด้านบน
+      กดแท็บเพื่อดูข้อใดข้อหนึ่ง หรือใช้ลูกศร ← → / Home / End เมื่อโฟกัสแท็บอยู่
+    </div>
+
+    <div class="tablist" role="tablist" aria-label="Browser acceptance B1 ถึง B8">
+      <button class="tab" type="button" id="tab-b1" role="tab" aria-selected="true"
+              aria-controls="panel-b1" tabindex="0">B1 · Regression</button>
+      <button class="tab" type="button" id="tab-b2" role="tab" aria-selected="false"
+              aria-controls="panel-b2" tabindex="-1">B2 · DC SPICE</button>
+      <button class="tab" type="button" id="tab-b3" role="tab" aria-selected="false"
+              aria-controls="panel-b3" tabindex="-1">B3 · Change RE</button>
+      <button class="tab" type="button" id="tab-b4" role="tab" aria-selected="false"
+              aria-controls="panel-b4" tabindex="-1">B4 · AC</button>
+      <button class="tab" type="button" id="tab-b5" role="tab" aria-selected="false"
+              aria-controls="panel-b5" tabindex="-1">B5 · Transient</button>
+      <button class="tab" type="button" id="tab-b6" role="tab" aria-selected="false"
+              aria-controls="panel-b6" tabindex="-1">B6 · Change Source</button>
+      <button class="tab" type="button" id="tab-b7" role="tab" aria-selected="false"
+              aria-controls="panel-b7" tabindex="-1">B7 · Invalid / Fail</button>
+      <button class="tab" type="button" id="tab-b8" role="tab" aria-selected="false"
+              aria-controls="panel-b8" tabindex="-1">B8 · UI</button>
+    </div>
+
+    <div class="tabpanel" id="panel-b1" role="tabpanel" aria-labelledby="tab-b1" tabindex="0">
+      <h3>B1 · Lab 03 regression</h3>
+      <div class="evidence">
+        <div>
+          <p>เปิด Fixed / Emitter / Voltage Divider แล้วกรอกชุดค่าจาก Lab 3 ผลยังตรงค่าอ้างอิงและสลับโหมดได้</p>
+          <ul>
+            <li>Fixed: IC 1.13 mA · VCE 9.514 V</li>
+            <li>Emitter: IC 1.03 mA · VCE 8.705 V</li>
+            <li>Divider: IC 1.23 mA · VCE 8.052 V</li>
+          </ul>
+          <p class="hint">เครื่องมือที่ใช้: OpenCode Built-in Browser Tool (Chromium) — ไม่ใช่ Playwright MCP</p>
+        </div>
+        <figure>
+          <a href="/capture/B1_lab3_regression.png" target="_blank" rel="noopener">
+            <img src="/capture/B1_lab3_regression.png" alt="Lab 03 regression screenshot" loading="lazy">
+          </a>
+          <figcaption>B1_lab3_regression.png</figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <div class="tabpanel" id="panel-b2" role="tabpanel" aria-labelledby="tab-b2" tabindex="0" hidden>
+      <h3>B2 · DC operating point from ngspice</h3>
+      <div class="evidence">
+        <div>
+          <p>Engine: <code>ngspice-47 : Circuit level simulation program</code> · Status: Success</p>
+          <table>
+            <tbody>
+              <tr><th>VB (V)</th><td>1.95507</td></tr>
+              <tr><th>VE (V)</th><td>1.25451</td></tr>
+              <tr><th>VC (V)</th><td>9.26556</td></tr>
+              <tr><th>VCE (V)</th><td>8.01105</td></tr>
+              <tr><th>IC (A)</th><td>0.00124293 (1.2429 mA)</td></tr>
+            </tbody>
+          </table>
+          <p class="hint">Lab 03 analytical reference แยกต่างหาก: IC 1.23 mA · VCE 8.052 V (constant β / VBE)</p>
+          <p class="hint">Model, netlist และ run log แสดงในผลรันจริงด้านบนของหน้านี้</p>
+        </div>
+        <figure>
+          <a href="/capture/B2_dc_spice.png" target="_blank" rel="noopener">
+            <img src="/capture/B2_dc_spice.png" alt="DC SPICE result screenshot" loading="lazy">
+          </a>
+          <figcaption>B2_dc_spice.png</figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <div class="tabpanel" id="panel-b3" role="tabpanel" aria-labelledby="tab-b3" tabindex="0" hidden>
+      <h3>B3 · เปลี่ยน RE เพียงค่าเดียว</h3>
+      <div class="evidence">
+        <div>
+          <p>RE 1 kΩ → 2 kΩ แล้วรัน DC ซ้ำ ผลเปลี่ยนตาม ngspice ไม่ใช่ค่าค้าง</p>
+          <table>
+            <tbody>
+              <tr><th>VB (V)</th><td>1.95507 → 2.05135</td></tr>
+              <tr><th>IC (A)</th><td>0.00124293 → 0.00067715</td></tr>
+              <tr><th>VCE (V)</th><td>8.01105 → 9.14348</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <figure>
+          <a href="/capture/B3_change_RE.png" target="_blank" rel="noopener">
+            <img src="/capture/B3_change_RE.png" alt="RE change result screenshot" loading="lazy">
+          </a>
+          <figcaption>B3_change_RE.png</figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <div class="tabpanel" id="panel-b4" role="tabpanel" aria-labelledby="tab-b4" tabindex="0" hidden>
+      <h3>B4 · AC Bode plots</h3>
+      <div class="evidence">
+        <div>
+          <p>กราฟ gain (dB) และ phase (degrees) แกนความถี่ Hz แบบ log สร้างจากข้อมูล <code>wrdata</code> ของรันจริง</p>
+          <ul>
+            <li>Peak gain in sweep: 4.86 dB</li>
+            <li>Lower −3 dB ≈ 1.884 Hz</li>
+            <li>Upper −3 dB: <strong>not determined in sweep range (1 Hz – 10 MHz)</strong></li>
+            <li>Phase @ 1 kHz ≈ −179.87° (จาก <code>vp(out) − vp(in)</code> แล้วแปลง rad → deg)</li>
+          </ul>
+        </div>
+        <figure>
+          <a href="/capture/B4_ac_bode.png" target="_blank" rel="noopener">
+            <img src="/capture/B4_ac_bode.png" alt="AC Bode plot screenshot" loading="lazy">
+          </a>
+          <figcaption>B4_ac_bode.png</figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <div class="tabpanel" id="panel-b5" role="tabpanel" aria-labelledby="tab-b5" tabindex="0" hidden>
+      <h3>B5 · Transient ที่ 10 mV peak / 1 kHz</h3>
+      <div class="evidence">
+        <div>
+          <p>เห็น Vin/Vout ตามเวลา (ms) และสัญญาณกลับเฟสตามข้อสมมติของ CE</p>
+          <table>
+            <tbody>
+              <tr><th>Vin peak (V)</th><td>0.0099999</td></tr>
+              <tr><th>Vout peak (V)</th><td>0.0175006</td></tr>
+              <tr><th>|Vout/Vin| peak</th><td>1.7501</td></tr>
+            </tbody>
+          </table>
+          <p class="hint">Vout/Vin slope ratio จาก parsed traces = −1.74884 → inverse phase</p>
+        </div>
+        <figure>
+          <a href="/capture/B5_tran_10mV_1kHz.png" target="_blank" rel="noopener">
+            <img src="/capture/B5_tran_10mV_1kHz.png" alt="Transient waveform screenshot" loading="lazy">
+          </a>
+          <figcaption>B5_tran_10mV_1kHz.png</figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <div class="tabpanel" id="panel-b6" role="tabpanel" aria-labelledby="tab-b6" tabindex="0" hidden>
+      <h3>B6 · เปลี่ยน amplitude แล้วรันซ้ำ</h3>
+      <div class="evidence">
+        <div>
+          <p>10 mV peak → 20 mV peak ในโหมด transient กราฟเปลี่ยนตามผลจำลอง ไม่ใช่ hard-code</p>
+          <table>
+            <tbody>
+              <tr><th>Vin peak (V)</th><td>0.0099999 → 0.0199998</td></tr>
+              <tr><th>Vout peak (V)</th><td>0.0175006 → 0.0350252</td></tr>
+              <tr><th>|Vout/Vin| peak</th><td>1.7501 → 1.7513</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <figure>
+          <a href="/capture/B6_change_amplitude.png" target="_blank" rel="noopener">
+            <img src="/capture/B6_change_amplitude.png" alt="Amplitude change screenshot" loading="lazy">
+          </a>
+          <figcaption>B6_change_amplitude.png (after)</figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <div class="tabpanel" id="panel-b7" role="tabpanel" aria-labelledby="tab-b7" tabindex="0" hidden>
+      <h3>B7 · Invalid input / fail state</h3>
+      <div class="evidence">
+        <div>
+          <p>ใส่ RE = 0 แล้วsubmit ระบบแจ้ง Error และไม่แสดงผลสำเร็จปลอม</p>
+          <p class="error">RE ต้องมากกว่า 0</p>
+          <ul>
+            <li>HTTP 400</li>
+            <li>ไม่มีแถบ <code>Status: Success</code></li>
+            <li>ไม่มีส่วน <code>Simulation results</code></li>
+          </ul>
+          <p class="hint">Engine-unavailable variant: NOT RUN (ngspice พร้อมใช้งานในเครื่องนี้)</p>
+        </div>
+        <figure>
+          <a href="/capture/B6_validation_error.png" target="_blank" rel="noopener">
+            <img src="/capture/B6_validation_error.png" alt="Invalid input error screenshot" loading="lazy">
+          </a>
+          <figcaption>B6_validation_error.png</figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <div class="tabpanel" id="panel-b8" role="tabpanel" aria-labelledby="tab-b8" tabindex="0" hidden>
+      <h3>B8 · Desktop และ 390 px viewport</h3>
+      <div class="evidence">
+        <div>
+          <p>เปิด Desktop และ viewport กว้าง 390 CSS px แล้วเปลี่ยน analysis mode กราฟ/หน่วย/ปุ่มอ่านง่าย</p>
+          <ul>
+            <li><code>window.innerWidth = 390</code></li>
+            <li><code>.grid</code> คอมพิวต์เป็น 1 คอลัมน์ (307 px)</li>
+            <li>ปุ่มกว้าง 157 px ยังอ่านง่าย</li>
+            <li>เปลี่ยน mode เป็น AC สำเร็จ</li>
+          </ul>
+          <p class="hint">หลักฐานเป็น iframe viewport 390 px ใน Chromium ไม่ใช่ Playwright MCP device emulation</p>
+          <p><a href="/capture/UI_after_impeccable_mobile_390px.png" target="_blank" rel="noopener">ดูภาพ 390 px แบบเต็ม</a></p>
+        </div>
+        <figure>
+          <a href="/capture/B8_desktop.png" target="_blank" rel="noopener">
+            <img src="/capture/B8_desktop.png" alt="Desktop UI screenshot" loading="lazy">
+          </a>
+          <figcaption>B8_desktop.png · desktop</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    (() => {
+      const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
+      const activate = (tab, focus = false) => {
+        tabs.forEach((item) => {
+          const selected = item === tab;
+          item.setAttribute('aria-selected', String(selected));
+          item.tabIndex = selected ? 0 : -1;
+          const panel = document.getElementById(item.getAttribute('aria-controls'));
+          if (panel) panel.hidden = !selected;
+        });
+        if (focus) tab.focus();
+      };
+      tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => activate(tab));
+        tab.addEventListener('keydown', (event) => {
+          let next = null;
+          if (event.key === 'ArrowRight') next = tabs[(index + 1) % tabs.length];
+          else if (event.key === 'ArrowLeft') next = tabs[(index - 1 + tabs.length) % tabs.length];
+          else if (event.key === 'Home') next = tabs[0];
+          else if (event.key === 'End') next = tabs[tabs.length - 1];
+          if (next) {
+            event.preventDefault();
+            activate(next, true);
+          }
+        });
+      });
+    })();
+  </script>
 
   <footer>
     Lab 04 · Flask + external ngspice subprocess · no mock traces · DC analytical values are labelled separately.

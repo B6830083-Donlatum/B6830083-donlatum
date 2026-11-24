@@ -25,6 +25,12 @@ All numbers below were read from the live page or from ngspice output produced i
 
 **B8 limitation:** the phone check is a **390 CSS pixel iframe viewport** in Chromium, not a physical phone or Playwright MCP device emulation. This is stated explicitly to avoid overclaiming.
 
+## 8-tab acceptance panel in the web UI
+
+`templates/simulator.html` now has a `role="tablist"` section with exactly eight tabs — B1 through B8 — one recorded case per tab. Each panel shows the observed values and the matching screenshot served by the new safe `/capture/<filename>` route. The panels are explicitly labelled as recorded browser evidence, not as results from the form currently on the page.
+
+Keyboard behaviour was checked in Chromium: when a tab has focus, `ArrowRight` from B8 wraps to B1, and `Home` / `End` / `ArrowLeft` move as expected. Only one panel is visible at a time, and `aria-selected` / `tabindex` follow the active tab.
+
 ## Impeccable UI review
 
 Impeccable `detect --json templates/simulator.html templates/index.html` reported:
