@@ -11,132 +11,140 @@
       --teal: #07766e; --line: #cedde7; --muted: #486275; --warn: #a65a2c;
       --err: #a22d2d; --ok: #0d6e5d;
     }
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; scrollbar-color: #9db8c8 var(--bg); scrollbar-width: thin; }
+    ::selection { background: #b9e6dd; color: var(--navy); }
     body { margin: 0; background: var(--bg); color: var(--ink);
       font-family: system-ui, "Noto Sans Thai", Tahoma, sans-serif; line-height: 1.6; }
     a { color: #125e8d; }
-    .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 18px 60px; }
+    .wrap { max-width: 1460px; margin: 0 auto; padding: 26px 22px 64px; }
     header { background: var(--navy); color: white; border-bottom: 5px solid #27ac9c;
-      padding: 24px 0 22px; margin-bottom: 18px; }
+      padding: 26px 0 24px; margin-bottom: 18px; }
     header .wrap { padding-bottom: 0; }
-    h1 { margin: 0; font-size: clamp(1.5rem, 3vw, 2.2rem); }
-    header p { margin: 6px 0 0; color: #cde9e6; }
-    nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
-    nav a { background: white; border: 1px solid var(--line); border-radius: 6px;
-      padding: 6px 11px; text-decoration: none; font-size: .9rem; }
+    h1 { margin: 0; font-size: clamp(1.65rem, 3vw, 2.45rem); letter-spacing: -.02em; }
+    header p { margin: 8px 0 0; color: #cde9e6; font-size: 1rem; }
+    nav { display: flex; flex-wrap: wrap; gap: 9px; margin: 16px 0; }
+    nav a { background: white; border: 1px solid var(--line); border-radius: 8px;
+      padding: 8px 14px; text-decoration: none; font-size: .95rem; font-weight: 600; }
+    nav a:hover { border-color: var(--teal); }
     .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px;
-      padding: 20px; margin-bottom: 18px; box-shadow: 0 8px 24px rgba(16,54,88,.06); }
-    h2 { color: var(--navy); font-size: 1.3rem; margin: 0 0 14px; }
-    h3 { color: var(--navy); font-size: 1rem; margin: 18px 0 8px; }
+      padding: 24px; margin-bottom: 18px; box-shadow: 0 8px 24px rgba(16,54,88,.06); }
+    h2 { color: var(--navy); font-size: 1.45rem; margin: 0 0 14px; }
+    h3 { color: var(--navy); font-size: 1.1rem; margin: 18px 0 8px; }
     .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
-    label { display: block; font-weight: 650; font-size: .88rem; margin-bottom: 4px; }
-    input, select { width: 100%; padding: 9px 10px; border: 1px solid var(--line);
-      border-radius: 8px; background: #fbfdff; color: var(--ink); font: inherit; }
+    label { display: block; font-weight: 650; font-size: .95rem; margin-bottom: 5px; }
+    input, select { width: 100%; padding: 11px 12px; border: 1px solid var(--line);
+      border-radius: 8px; background: #fbfdff; color: var(--ink); font: inherit; font-size: .95rem; }
     input:focus, select:focus { outline: 2px solid var(--teal); outline-offset: 1px; }
     .field { display: flex; gap: 6px; }
-    button { border: 0; border-radius: 8px; padding: 11px 20px; background: var(--teal);
-      color: white; font-weight: 700; cursor: pointer; font-size: 1rem; }
+    button { border: 0; border-radius: 8px; padding: 13px 26px; background: var(--teal);
+      color: white; font-weight: 700; cursor: pointer; font-size: 1.05rem; }
     button:hover { filter: brightness(1.08); }
-    .actions { margin-top: 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-    .hint { color: var(--muted); font-size: .84rem; }
+    button:focus-visible { outline: 3px solid var(--navy); outline-offset: 2px; }
+    .actions { margin-top: 18px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+    .hint { color: var(--muted); font-size: .9rem; }
     .error { margin-top: 14px; padding: 12px 14px; border-radius: 8px;
       background: #fdecec; border: 1px solid #e5a3a3; color: var(--err); }
     .notice { background: #eaf6f2; border: 1px solid #8cc9bb;
-      padding: 10px 14px; border-radius: 8px; margin: 12px 0; font-size: .9rem; }
-    .badge { display: inline-block; padding: 5px 10px; border-radius: 999px;
-      font-size: .78rem; font-weight: 700; margin: 0 6px 6px 0; }
+      padding: 10px 14px; border-radius: 8px; margin: 12px 0; font-size: .94rem; }
+    .badge { display: inline-block; padding: 6px 12px; border-radius: 999px;
+      font-size: .85rem; font-weight: 700; margin: 0 6px 6px 0; }
     .badge.engine { background: #eaf6f2; border: 1px solid #8cc9bb; color: var(--ok); }
     .badge.analysis { background: #e9f1f8; border: 1px solid #9dbed5; color: var(--navy); }
     .badge.error { background: #fdecec; border: 1px solid #e5a3a3; color: var(--err); }
-    table { width: 100%; border-collapse: collapse; font-size: .92rem; }
-    th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+    table { width: 100%; border-collapse: collapse; font-size: .96rem; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); }
     th { background: #eaf2f8; color: var(--navy); width: 42%; }
     td { font-variant-numeric: tabular-nums; }
     .plot { width: 100%; height: auto; display: block; background: #fbfdff;
       border: 1px solid var(--line); border-radius: 8px; margin: 10px 0; }
-    .plot-title { font-size: 13px; font-weight: 700; fill: var(--navy); }
+    .plot-title { font-size: 15px; font-weight: 700; fill: var(--navy); }
     .grid { stroke: #dbe6ed; stroke-width: 1; }
     .axis { stroke: #8ba3b4; stroke-width: 1.3; }
-    .tick { font-size: 10px; fill: var(--muted); }
-    .axis-label { font-size: 11px; fill: var(--navy); }
-    .legend { font-size: 10px; fill: var(--ink); }
+    .tick { font-size: 12px; fill: var(--muted); }
+    .axis-label { font-size: 13px; fill: var(--navy); }
+    .legend { font-size: 12px; fill: var(--ink); }
     details { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px;
-      margin-top: 12px; background: #fcfdff; font-size: .85rem; }
+      margin-top: 12px; background: #fcfdff; font-size: .9rem; }
     summary { cursor: pointer; font-weight: 700; color: var(--navy); }
-    pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: .8rem;
+    pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: .85rem;
       max-height: 300px; overflow: auto; }
     .warnings { background: #fff4ea; border: 1px solid #e2b68f; color: #714321;
       border-radius: 8px; padding: 10px 14px; margin-top: 12px; }
-    footer { color: var(--muted); font-size: .82rem; text-align: center; }
+    footer { color: var(--muted); font-size: .88rem; text-align: center; }
 
     /* Three-column workbench: circuit / plots / results (screen target). */
-    .workbench { display: grid; align-items: start; gap: 14px;
-      grid-template-columns: minmax(270px, 320px) minmax(0, 1fr) minmax(240px, 280px); }
+    .workbench { display: grid; align-items: start; gap: 18px;
+      grid-template-columns: minmax(340px, 400px) minmax(0, 1fr) minmax(280px, 320px); }
     .panel { min-width: 0; background: var(--card); border: 1px solid var(--line);
-      border-radius: 12px; padding: 18px; box-shadow: 0 8px 24px rgba(16,54,88,.06); }
-    .panel > h2, .panel-head h2 { font-size: 1.25rem; margin: 0 0 12px; }
-    .panel-head { display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
-      justify-content: space-between; margin-bottom: 12px; }
+      border-radius: 12px; padding: 22px; box-shadow: 0 8px 24px rgba(16,54,88,.06); }
+    .panel > h2, .panel-head h2 { font-size: 1.45rem; margin: 0 0 12px; }
+    .panel-head { display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+      justify-content: space-between; margin-bottom: 14px; }
     .panel-head h2 { margin: 0; }
-    .panel .notice { margin: 0 0 12px; font-size: .84rem; }
-    .circuit { margin: 0 0 12px; border: 1px solid var(--line); border-radius: 8px;
-      background: #f6fafc; padding: 10px; }
+    .panel .notice { margin: 0 0 12px; font-size: .94rem; }
+    .circuit { margin: 0 0 12px; border: 1px solid var(--line); border-radius: 10px;
+      background: #f6fafc; padding: 12px; }
     .circuit svg { width: 100%; height: auto; display: block; }
-    .circuit figcaption { color: var(--muted); font-size: .76rem; margin-top: 6px; }
+    .circuit figcaption { color: var(--muted); font-size: .86rem; margin-top: 8px; }
     fieldset.segmented { margin: 0; min-width: 0; }
-    .segmented { display: inline-flex; gap: 3px; padding: 3px; border: 1px solid var(--line);
-      border-radius: 8px; background: #f6fafc; }
+    .segmented { display: inline-flex; gap: 4px; padding: 4px; border: 1px solid var(--line);
+      border-radius: 9px; background: #f6fafc; }
     .segmented input { position: absolute; width: 1px; height: 1px; opacity: 0; }
-    .segmented label { display: inline-block; padding: 5px 11px; border-radius: 5px;
-      font-size: .82rem; font-weight: 700; color: var(--navy); cursor: pointer; }
+    .segmented label { display: inline-block; padding: 8px 14px; border-radius: 6px;
+      font-size: .9rem; font-weight: 700; color: var(--navy); cursor: pointer; }
     .segmented label:hover { background: #e6eff7; }
     .segmented input:checked + label { background: var(--teal); color: #fff; }
     .segmented input:focus-visible + label { outline: 2px solid var(--navy); outline-offset: 2px; }
-    .mode-caption { display: block; color: var(--muted); font-size: .74rem; margin-bottom: 6px; }
-    .plot-stack { display: grid; gap: 12px; }
+    .mode-caption { display: block; color: var(--muted); font-size: .82rem; margin-bottom: 7px; }
+    .plot-stack { display: grid; gap: 14px; }
     .empty { border: 1px dashed #a9c4d4; border-radius: 8px; background: #fbfdff;
-      color: var(--muted); padding: 20px; font-size: .88rem; }
-    .result-meta { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px; }
+      color: var(--muted); padding: 30px; font-size: .96rem; }
+    .result-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
     .result-meta .badge { margin: 0; }
-    .panel-right h3 { margin: 14px 0 6px; font-size: .9rem; }
-    .panel-right table { font-size: .84rem; }
+    .panel-right h3 { margin: 16px 0 8px; font-size: 1.1rem; }
+    .panel-right table { font-size: .92rem; }
     .panel-right th { width: 46%; }
-    .panel details { margin-top: 10px; }
-    .fixture-line { color: var(--muted); font-size: .78rem; margin: 0 0 8px; }
+    .panel details { margin-top: 12px; }
+    .fixture-line { color: var(--muted); font-size: .86rem; margin: 0 0 10px; }
 
     /* Browser acceptance: eight explicit cases, one per tab. */
     .tablist { display: flex; gap: 6px; overflow-x: auto; padding: 4px 2px 10px;
       border-bottom: 1px solid var(--line); }
     .tab { flex: 0 0 auto; border: 1px solid var(--line); border-radius: 8px 8px 0 0;
-      background: #f8fbfe; color: var(--navy); padding: 8px 12px; font-size: .85rem;
+      background: #f8fbfe; color: var(--navy); padding: 9px 14px; font-size: .9rem;
       font-weight: 750; cursor: pointer; }
     .tab[aria-selected="true"] { background: var(--navy); border-color: var(--navy); color: #fff; }
     .tab:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
-    .tabpanel { padding: 16px 2px 0; }
+    .tabpanel { padding: 18px 2px 0; }
     .tabpanel[hidden] { display: none; }
-    .evidence { display: grid; grid-template-columns: minmax(0, 1fr) 280px;
-      gap: 18px; align-items: start; }
+    .evidence { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(280px, .65fr);
+      gap: 22px; align-items: start; }
     .evidence figure { margin: 0; }
     .evidence img { width: 100%; border: 1px solid var(--line); border-radius: 8px;
-      background: #fff; display: block; }
-    .evidence figcaption { color: var(--muted); font-size: .78rem; margin-top: 6px; }
-    .evidence p, .evidence li { font-size: .88rem; }
+      background: #fff; display: block; box-shadow: 0 6px 18px rgba(16,54,88,.06); }
+    .evidence figcaption { color: var(--muted); font-size: .84rem; margin-top: 8px; }
+    .evidence p, .evidence li { font-size: .94rem; }
     @media (max-width: 1080px) {
-      .workbench { grid-template-columns: minmax(260px, 320px) minmax(0, 1fr); }
+      .workbench { grid-template-columns: minmax(300px, 360px) minmax(0, 1fr); }
       .panel-right { grid-column: 1 / -1; }
     }
     @media (max-width: 760px) {
-      header { padding: 18px 0 16px; }
-      .card { padding: 15px; }
+      header { padding: 20px 0 18px; }
+      .wrap { padding: 20px 14px 48px; }
+      .card { padding: 18px; }
       .grid { grid-template-columns: 1fr; }
       .evidence { grid-template-columns: 1fr; }
       .workbench { grid-template-columns: 1fr; }
       .panel-right { grid-column: auto; }
-      .panel { padding: 15px; }
+      .panel { padding: 18px; }
     }
   </style>
 </head>
 <body>
+{% macro rlabel(name, default) -%}
+{% set u = form.get(name ~ '_unit', 'kohm') -%}
+{{ form.get(name, default) }}{% if u == 'kohm' %} kΩ{% elif u == 'mohm' %} MΩ{% else %} Ω{% endif -%}
+{%- endmacro %}
 <header>
   <div class="wrap">
     <h1>BJT CE Amplifier Simulator · Lab 04</h1>
@@ -164,7 +172,7 @@
           <desc id="ce-desc">VCC feeds R1 and RC. R1 and R2 meet at the base of Q1.
             RC feeds the collector, RE connects the emitter to ground, Cin and Cout couple
             the source and RL, and all grounds are shared.</desc>
-          <g fill="none" stroke="#3b6377" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <g fill="none" stroke="#3b6377" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
             <path d="M151 28H310 M151 28V64 M151 108V180 M310 28V64 M310 108V145"/>
             <rect x="144" y="64" width="14" height="44" fill="#fff"/>
             <rect x="303" y="64" width="14" height="44" fill="#fff"/>
@@ -187,20 +195,30 @@
             <path d="M43 278H414 M222 278V285 M211 285H233 M215 290H229" stroke-width="2"/>
           </g>
           <g fill="#254d67" font-family="Tahoma,Arial,sans-serif">
-            <text x="231" y="17" text-anchor="middle" font-size="17" font-weight="700">+VCC</text>
-            <text x="164" y="91" font-size="15">R1</text><text x="323" y="91" font-size="15">RC</text>
-            <text x="164" y="230" font-size="15">R2</text><text x="323" y="253" font-size="15">RE</text>
-            <text x="242" y="246" font-size="16" font-weight="700">Q1 NPN</text>
-            <text x="81" y="155" font-size="14" text-anchor="middle">Cin</text>
-            <text x="353" y="119" font-size="14" text-anchor="middle">Cout</text>
-            <text x="426" y="216" font-size="15">RL</text>
-            <text x="414" y="131" font-size="15">Vout</text>
-            <text x="8" y="245" font-size="14">Vin</text>
-            <text x="223" y="270" font-size="13">GND</text>
+            <text x="231" y="17" text-anchor="middle" font-size="22" font-weight="700">+VCC {{ form.get('vcc', '12') }} V</text>
+            <text x="164" y="90" font-size="20" font-weight="700">R1</text>
+            <text x="164" y="109" font-size="15" fill="#07766e">{{ rlabel('r1', '100') }}</text>
+            <text x="323" y="90" font-size="20" font-weight="700">RC</text>
+            <text x="323" y="109" font-size="15" fill="#07766e">{{ rlabel('rc', '2.2') }}</text>
+            <text x="164" y="229" font-size="20" font-weight="700">R2</text>
+            <text x="164" y="248" font-size="15" fill="#07766e">{{ rlabel('r2', '22') }}</text>
+            <text x="323" y="251" font-size="20" font-weight="700">RE</text>
+            <text x="323" y="270" font-size="15" fill="#07766e">{{ rlabel('re', '1') }}</text>
+            <text x="250" y="268" text-anchor="middle" font-size="20" font-weight="700">Q1 NPN</text>
+            <text x="81" y="150" text-anchor="middle" font-size="19">Cin</text>
+            <text x="81" y="134" text-anchor="middle" font-size="14" fill="#07766e">{{ form.get('cin', '10') }} µF</text>
+            <text x="353" y="118" text-anchor="middle" font-size="19">Cout</text>
+            <text x="353" y="102" text-anchor="middle" font-size="14" fill="#07766e">{{ form.get('cout', '10') }} µF</text>
+            <text x="426" y="215" font-size="20" font-weight="700">RL</text>
+            <text x="426" y="234" font-size="15" fill="#07766e">{{ rlabel('rl', '10') }}</text>
+            <text x="414" y="130" font-size="19">Vout</text>
+            <text x="8" y="245" font-size="19">Vin</text>
+            <text x="8" y="263" font-size="14" fill="#07766e">{{ (form.get('amp', '0.01')|float * 1000)|round|int }} mV / {{ (form.get('freq', '1000')|float)|round|int }} Hz</text>
+            <text x="223" y="270" font-size="16">GND</text>
           </g>
-          <g fill="#07766e"><circle cx="151" cy="180" r="4"/><circle cx="310" cy="145" r="4"/></g>
+          <g fill="#07766e"><circle cx="151" cy="180" r="4"/><circle cx="310" cy="145" r="4"/><circle cx="310" cy="236" r="4"/></g>
         </svg>
-        <figcaption>CE voltage-divider · NPN Q1 · RE ไม่ถูก bypass · ค่าที่ใช้คือค่ในฟอร์มด้านล่าง</figcaption>
+        <figcaption>CE voltage-divider · NPN Q1 · RE ไม่ถูก bypass · ค่าบนวงจรอัปเดตตามฟอร์มทุกครั้งที่รัน</figcaption>
       </figure>
       <p class="fixture-line">ตัวเลขในวงจรอ้างอิง: VCC 12 V · R1 100 kΩ · R2 22 kΩ · RC 2.2 kΩ · RE 1 kΩ · RL 10 kΩ · Cin/Cout 10 µF · 10 mV / 1 kHz</p>
       <div class="grid">
@@ -558,8 +576,8 @@
           <p>เปิด Desktop และ viewport กว้าง 390 CSS px แล้วเปลี่ยน analysis mode กราฟ/หน่วย/ปุ่มอ่านง่าย</p>
           <ul>
             <li><code>window.innerWidth = 390</code></li>
-            <li><code>.grid</code> คอมพิวต์เป็น 1 คอลัมน์ (307 px)</li>
-            <li>ปุ่มกว้าง 157 px ยังอ่านง่าย</li>
+            <li><code>.grid</code> คอมพิวต์เป็น 1 คอลัมน์ (314 px)</li>
+            <li>ปุ่มกว้าง 175 px และวงจรแสดงค่าจากฟอร์ม ยังอ่านง่าย</li>
             <li>เปลี่ยน mode เป็น AC สำเร็จ</li>
           </ul>
           <p class="hint">หลักฐานเป็น iframe viewport 390 px ใน Chromium ไม่ใช่ Playwright MCP device emulation</p>

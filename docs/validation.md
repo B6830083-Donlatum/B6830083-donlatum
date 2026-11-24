@@ -35,14 +35,17 @@ Keyboard behaviour was checked in Chromium: when a tab has focus, `ArrowRight` f
 
 The simulator page follows the handout's `02 / SCREEN TARGET` wireframe: a left **Circuit & Parameters** column with an electrically connected CE voltage-divider schematic and all inputs, a middle **Simulation & Plots** column with a DC / AC / Transient segmented control and the real SVG traces, and a right **Engineering Results** column with engine/analysis/status, model provenance, numeric summaries and the separate Lab 03 analytical reference. The eight acceptance tabs remain below the workbench, unchanged.
 
-Layout was checked with the built-in browser tool at desktop and in a 390 CSS px iframe viewport:
+A later readability pass enlarged the page rather than changing its structure: wider `wrap` (1460 px), larger type and controls, larger SVG chart ticks/labels, and a circuit schematic whose component values are rendered from the live form (`+VCC 12 V`, `100 kΩ`, `22 kΩ`, `2.2 kΩ`, `1 kΩ`, `10 kΩ`, `10 µF`, `10 mV / 1000 Hz`) with three node dots and bigger labels. The values are display only — the netlist is still built from parsed form inputs by `spice_engine.py`.
 
-- Desktop computed grid: `320px 516px 280px`, no horizontal page overflow.
-- 390 px viewport: `.workbench` collapses to one `339px` column, `.grid` fields to one `307px` column, no horizontal page overflow.
-- The segmented control is a real radio group in the same form; POST `/simulate` with `analysis=ac` still returned HTTP 200 with `Status: Success`, AC plots, peak-gain table, netlist and run log.
+Layout was checked with the built-in browser tool at 1440 px, at the browser pane's 1000 px, and in a 390 CSS px iframe viewport:
+
+- Desktop at 1440 px computed grid: `400px 630px 320px`, no horizontal page overflow; circuit SVG 328 px wide.
+- 1000 px pane: falls back to the two-column rule `360px 568px`, results panel below.
+- 390 px viewport: `.workbench` collapses to one `352px` column, `.grid` fields to one `314px` column, submit button 175 px, no horizontal page overflow.
+- The segmented control is a real radio group in the same form; POST `/simulate` re-run for **dc, ac and tran** returned HTTP 200 with `Status: Success`, the expected plots (0 / 2 / 1), netlist and run log, and the circuit labels still reflect the submitted values.
 - No illustrative/fake traces were added: the empty state explicitly says that plots come from the current ngspice run.
 
-Impeccable `shot` captures: `captures/wireframe_workbench_1440x900.png` and `captures/wireframe_workbench_390x844.png`.
+Impeccable `shot` captures: `captures/wireframe_workbench_1440x900.png` and `captures/wireframe_workbench_390x844.png`. The built-in browser tool captures `captures/B8_desktop.png` and `captures/B8_mobile_390px_frame.png`; `UI_after_impeccable_*` were refreshed from the same run so all UI images show the current page.
 
 ## Impeccable UI review
 
@@ -56,7 +59,7 @@ Fixes made without changing any numerical formula or simulation output:
 - `.notice` now uses a full `1px solid #8cc9bb` border and an 8 px radius.
 - `--err` changed to `#ff9d9d` for adequate contrast on the dark card.
 
-Before/after screenshots are in `captures/B8_desktop.png` → `captures/UI_after_impeccable_desktop.png` and `captures/B8_mobile_390px_frame.png` → `captures/UI_after_impeccable_mobile_390px.png`.
+Before/after screenshots are in `captures/B8_desktop.png` → `captures/UI_after_impeccable_desktop.png` and `captures/B8_mobile_390px_frame.png` → `captures/UI_after_impeccable_mobile_390px.png`. A final `detect --json templates/simulator.html templates/index.html` after the readability pass returned `[]` (clean); the shot captures above were refreshed from that build.
 
 ## Provenance checks performed
 
