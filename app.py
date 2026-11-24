@@ -10,12 +10,14 @@ from typing import Any, Dict, List
 
 from flask import Flask, render_template, request
 
+from charts import ac_charts, tran_charts
 from dc_bias import (
     BiasResult,
     calculate_dc_bias,
     calculate_emitter_bias,
     calculate_fixed_bias,
 )
+from spice_engine import SpiceError, run_simulation
 
 app = Flask(__name__)
 
@@ -50,6 +52,32 @@ DEFAULTS: Dict[str, str] = {
     "re_unit": "kohm",
 }
 
+# Lab 04 CE simulator: reference fixture from the handout.
+SIM_DEFAULTS: Dict[str, str] = {
+    "vcc": "12",
+    "r1": "100", "r1_unit": "kohm",
+    "r2": "22", "r2_unit": "kohm",
+    "rc": "2.2", "rc_unit": "kohm",
+    "re": "1", "re_unit": "kohm",
+    "rl": "10", "rl_unit": "kohm",
+    "beta": "100",
+    "vbe": "0.7",
+    "cin": "10",
+    "cout": "10",
+    "amp": "0.01",
+    "freq": "1000",
+    "analysis": "dc",
+}
+
+ANALYSIS_LABELS = {
+    "dc": "DC operating point (.op)",
+    "ac": "AC frequency response (.ac)",
+    "tran": "Transient waveforms (.tran)",
+}
+
+SIM_RESISTORS = ["r1", "r2", "rc", "re", "rl"]
+SIM_NUMERIC_FIELDS = ["vcc", "beta", "vbe", "cin", "cout", "amp", "freq"]
+
 UNIT_FACTORS = {
     "ohm": 1.0,
     "kohm": 1_000.0,
@@ -63,6 +91,11 @@ LABELS = {
     "rb": "RB",
     "rc": "RC",
     "re": "RE",
+    "rl": "RL",
+    "cin": "Cin",
+    "cout": "Cout",
+    "amp": "Amplitude",
+    "freq": "Frequency",
     "beta": "Beta",
     "vbe": "VBE",
 }
@@ -130,6 +163,48 @@ def parse_form(form: Any, mode: str) -> Dict[str, float]:
 
     for name in MODES[mode]["resistors"]:
         values[name] = _resistance(form, name)
+
+    return values
+
+
+def parse_sim_form(form: Any) -> Dict[str, float]:
+    """Validate the CE simulator fixture before any netlist is generated."""
+
+    analysis = (form.get("analysis") or "").strip()
+    if analysis not in ANALYSIS_LABELS:
+        raise ValueError("Analysis mode ไม่รู้จัก กรุณาเลือก DC, AC หรือ Transient")
+
+    values: Dict[str, float] = {
+        "analysis": analysis,  # type: ignore[assignment]
+        "vcc": _number(form, "vcc"),
+        "beta": _number(form, "beta"),
+        "vbe": _number(form, "vbe"),
+    }
+    if not 0 < values["vcc"] <= 100:
+        raise ValueError("VCC ต้องอยู่ในช่วง 0–100 V")
+    if not 1 <= values["beta"] <= 100_000:
+        raise ValueError("Beta ต้องอยู่ในช่วง 1–100000")
+    if not 0 < values["vbe"] <= 10:
+        raise ValueError("VBE ต้องอยู่ในช่วง 0–10 V")
+
+    for name in SIM_RESISTORS:
+        values[name] = _resistance(form, name)
+
+    for name in ("cin", "cout"):
+        capacitance_uf = _number(form, name)
+        if not 0 < capacitance_uf <= 1000:
+            raise ValueError(f"{LABELS[name]} ต้องอยู่ในช่วง 0–1000 µF")
+        values[f"{name}_f"] = capacitance_uf * 1e-6
+
+    amp = _number(form, "amp")
+    if not 0 < amp <= 1:
+        raise ValueError("Amplitude ต้องอยู่ในช่วง 0–1 V peak (small-signal)")
+    values["amp"] = amp
+
+    freq = _number(form, "freq")
+    if not 1 <= freq <= 10_000_000:
+        raise ValueError("Frequency ต้องอยู่ในช่วง 1 Hz–10 MHz")
+    values["freq"] = freq
 
     return values
 
@@ -252,6 +327,105 @@ def calculate():
         preserved_fields=PRESERVED_FIELDS,
         result=present(result),
         error=None,
+    )
+
+
+def _sim_context(
+    form: Dict[str, str],
+    *,
+    error: str | None = None,
+    spice_log: str = "",
+    result: Any = None,
+    charts: Dict[str, str] | None = None,
+    analytical: Dict[str, Any] | None = None,
+) -> Dict[str, Any]:
+    analysis = form.get("analysis", "dc")
+    if analysis not in ANALYSIS_LABELS:
+        analysis = "dc"
+    return {
+        "form": form,
+        "analysis": analysis,
+        "analysis_labels": ANALYSIS_LABELS,
+        "sim_defaults": SIM_DEFAULTS,
+        "sim_resistors": SIM_RESISTORS,
+        "sim_numeric_fields": SIM_NUMERIC_FIELDS,
+        "error": error,
+        "spice_log": spice_log,
+        "result": result,
+        "charts": charts or {},
+        "analytical": analytical,
+    }
+
+
+@app.route("/simulator", methods=["GET"])
+def simulator():
+    """Lab 04 CE simulator page; Lab 3 bias calculator stays at '/'."""
+
+    form = SIM_DEFAULTS.copy()
+    for key in SIM_DEFAULTS:
+        if key in request.args:
+            form[key] = request.args[key]
+    return render_template("simulator.html", **_sim_context(form))
+
+
+@app.route("/simulate", methods=["POST"])
+def simulate():
+    submitted = request.form.to_dict()
+
+    try:
+        values = parse_sim_form(request.form)
+    except ValueError as exc:
+        return (
+            render_template(
+                "simulator.html",
+                **_sim_context(submitted, error=str(exc)),
+            ),
+            400,
+        )
+
+    analysis = str(values["analysis"])
+    analytical = present(
+        calculate_dc_bias(
+            vcc=values["vcc"],
+            r1=values["r1"],
+            r2=values["r2"],
+            rc=values["rc"],
+            re=values["re"],
+            beta=values["beta"],
+            vbe=values["vbe"],
+        )
+    )
+
+    try:
+        simulation = run_simulation(values, analysis)
+    except SpiceError as exc:
+        return (
+            render_template(
+                "simulator.html",
+                **_sim_context(
+                    submitted,
+                    error=str(exc),
+                    spice_log=exc.log,
+                    analytical=analytical,
+                ),
+            ),
+            400,
+        )
+
+    charts: Dict[str, str] = {}
+    if analysis == "ac":
+        charts = ac_charts(simulation.traces)
+    elif analysis == "tran":
+        charts = tran_charts(simulation.traces)
+
+    return render_template(
+        "simulator.html",
+        **_sim_context(
+            submitted,
+            result=simulation,
+            charts=charts,
+            analytical=analytical,
+        ),
     )
 
 

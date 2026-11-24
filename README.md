@@ -1,41 +1,88 @@
-# BJT DC Bias Web App (Lab 02 + Lab 03)
+# BJT DC Bias + CE Amplifier Simulator (Lab 03 + Lab 04)
 
-Flask web app for DC operating point calculation of three NPN bias circuits.
+Flask web app that keeps the three Lab 03 analytical DC-bias modes and adds a
+Lab 04 common-emitter amplifier simulator driven by **real ngspice runs**
+(`.op`, `.ac`, `.tran`).
 
-## Modes
+## What is where
 
-| Mode | Extra inputs | Function |
-|---|---|---|
-| Voltage Divider Bias (Lab 02) | R1, R2, RE | `calculate_dc_bias()` |
-| Fixed Bias | RB | `calculate_fixed_bias()` |
-| Emitter Bias | RB, RE | `calculate_emitter_bias()` |
+| Path | Role |
+| --- | --- |
+| `app.py` | Routes: `/` Lab 03 bias calculator, `/simulator` Lab 04 page, `/simulate` runs ngspice |
+| `dc_bias.py` | Lab 03 analytical equations — unchanged, used as a labelled reference |
+| `spice_engine.py` | Netlist builder + `subprocess.run` adapter + ngspice output parser |
+| `charts.py` | Dependency-free SVG plots drawn from parsed simulation arrays |
+| `templates/index.html` | Lab 03 form/results (unchanged behaviour, added link to Lab 04) |
+| `templates/simulator.html` | CE circuit parameters, analysis selector, status, provenance and plots |
+| `docs/validation.md` | A1–A5 (Lab 03) and B1–B8 (Lab 04) browser acceptance records |
+| `docs/captures/` | Browser screenshots used as evidence |
+| `AGENTS.md` | Rules for AI agents working on this repository |
 
-Shared inputs for every mode: VCC, RC, β, VBE. Inputs can be entered in Ω, kΩ or MΩ and are converted to SI before calculation.
+## Install
+
+Python 3.10+ is required.
+
+```powershell
+py -3 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+```
+
+### ngspice (external program, not a pip package)
+
+Windows (used for this submission):
+
+1. Download `ngspice-47_64.7z` from
+   <https://sourceforge.net/projects/ngspice/files/ng-spice-rework/47/>.
+2. Extract it, e.g. to `%LOCALAPPDATA%\Programs\ngspice-47`.
+3. Add its `Spice64\bin` folder to `PATH`, or set
+   `NGSPICE_EXECUTABLE` to the full path of `ngspice_con.exe`.
+4. Verify: `ngspice_con.exe --version`.
+
+Linux/macOS: install ngspice with the system package manager and verify
+`ngspice --version`.
 
 ## Run
 
 ```powershell
-cd "C:\Users\B6830083\Documents\Default Project"
-py -3 -m pip install flask
-py -3 app.py
+.\.venv\Scripts\python.exe app.py
 ```
 
-Open <http://127.0.0.1:5000/>.
+Open:
 
-Select a circuit in the dropdown and press **ใช้โหมดนี้** to reload the form with only the fields that circuit uses, then press **คำนวณ**.
+- Lab 03 bias calculator: <http://127.0.0.1:5000/>
+- Lab 04 CE simulator: <http://127.0.0.1:5000/simulator>
 
-## File layout
+The server binds to `127.0.0.1:5000` with `debug=False`.
 
-- `app.py` — routes, mode selection, input validation, unit conversion, result formatting.
-- `dc_bias.py` — three separate calculation functions returning the same `BiasResult` shape.
-- `templates/index.html` — Jinja form and result display.
-- `docs/validation.md` — A1–A5 browser acceptance table.
-- `Lab03_A1_Evidence.docx` — Word evidence with A1 screenshot.
-- `evidence/A1_lab02.png` — raw A1 screenshot.
+## Lab 04 reference circuit and model
 
-## Model
+Fixture: VCC = 12 V, R1 = 100 kΩ, R2 = 22 kΩ, RC = 2.2 kΩ, RE = 1 kΩ,
+RL = 10 kΩ, Cin = Cout = 10 µF, source = 10 mV peak at 1 kHz.
+RE is **unbypassed** in this baseline.
 
-Forward-active approximation with constant β and VBE. All functions return
-`vb_v`, `ve_v`, `vc_v`, `vce_v`, `ic_ma`-equivalent formatted values plus
-`region` and `warnings`. If IB ≤ 0 or VCE ≤ 0.2 V, the page shows a warning that
-the forward-active model may not be valid.
+The BJT uses a reproducible classroom model defined in `spice_engine.py`:
+
+```
+.model QNPN_CLASSROOM NPN (IS=2e-15 BF=<beta from form> VAF=100 CJC=10p CJE=20p TF=0.3n)
+```
+
+This is not a specific commercial part number. It is shown on the results page
+together with the engine version, netlist and ngspice log so results can be
+reproduced and audited. Do not expect SPICE and the constant-β/VBE analytical
+reference to agree to every digit; they use different models.
+
+## Engineering separation
+
+- DC: `.op` → VB, VE, VC, VCE, IC from ngspice output. Lab 03 analytical values are shown in a separate labelled table.
+- AC: `.ac dec 40 1 10meg` → gain (dB) and phase (degrees) versus frequency, with Vin measured at the source node before `Cin`.
+- Transient: `.tran` over five periods → Vin/Vout versus time in milliseconds.
+
+All plots are inline SVG generated from numbers parsed out of `wrdata` output
+files written by the current run. No trace is hardcoded. If the solver is
+missing, fails, times out or returns no data, the page shows an error and no
+stale results.
+
+## Notes
+
+- Do not commit `.venv/`, temporary run directories, API keys or large archives (see `.gitignore`).
+- Browser checks should be recorded honestly in `docs/validation.md`, including the exact tool used.

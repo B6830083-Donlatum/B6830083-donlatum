@@ -15,7 +15,7 @@
       --accent: #38bdf8;
       --ok: #34d399;
       --warn: #fbbf24;
-      --err: #f87171;
+      --err: #ff9d9d;
     }
     * { box-sizing: border-box; }
     body {
@@ -115,6 +115,7 @@
   <header>
     <h1>BJT DC Bias Calculator</h1>
     <p>Fixed Bias · Emitter Bias · Voltage Divider Bias — Lab 02/03</p>
+    <p><a href="{{ url_for('simulator') }}">→ ไปที่ CE Amplifier Simulator (Lab 04: ngspice DC / AC / Transient)</a></p>
   </header>
 
   {% macro number_field(name, label) %}

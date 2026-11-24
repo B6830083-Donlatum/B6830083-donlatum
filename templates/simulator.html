@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Lab 04 CE BJT amplifier simulator with real ngspice DC, AC and transient runs">
+  <title>CE Amplifier Simulator · Lab 04</title>
+  <style>
+    :root {
+      --bg: #f3f7fa; --card: #ffffff; --ink: #17344b; --navy: #103658;
+      --teal: #07766e; --line: #cedde7; --muted: #486275; --warn: #a65a2c;
+      --err: #a22d2d; --ok: #0d6e5d;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink);
+      font-family: system-ui, "Noto Sans Thai", Tahoma, sans-serif; line-height: 1.6; }
+    a { color: #125e8d; }
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 18px 60px; }
+    header { background: var(--navy); color: white; border-bottom: 5px solid #27ac9c;
+      padding: 24px 0 22px; margin-bottom: 18px; }
+    header .wrap { padding-bottom: 0; }
+    h1 { margin: 0; font-size: clamp(1.5rem, 3vw, 2.2rem); }
+    header p { margin: 6px 0 0; color: #cde9e6; }
+    nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+    nav a { background: white; border: 1px solid var(--line); border-radius: 6px;
+      padding: 6px 11px; text-decoration: none; font-size: .9rem; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+      padding: 20px; margin-bottom: 18px; box-shadow: 0 8px 24px rgba(16,54,88,.06); }
+    h2 { color: var(--navy); font-size: 1.3rem; margin: 0 0 14px; }
+    h3 { color: var(--navy); font-size: 1rem; margin: 18px 0 8px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
+    label { display: block; font-weight: 650; font-size: .88rem; margin-bottom: 4px; }
+    input, select { width: 100%; padding: 9px 10px; border: 1px solid var(--line);
+      border-radius: 8px; background: #fbfdff; color: var(--ink); font: inherit; }
+    input:focus, select:focus { outline: 2px solid var(--teal); outline-offset: 1px; }
+    .field { display: flex; gap: 6px; }
+    button { border: 0; border-radius: 8px; padding: 11px 20px; background: var(--teal);
+      color: white; font-weight: 700; cursor: pointer; font-size: 1rem; }
+    button:hover { filter: brightness(1.08); }
+    .actions { margin-top: 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .hint { color: var(--muted); font-size: .84rem; }
+    .error { margin-top: 14px; padding: 12px 14px; border-radius: 8px;
+      background: #fdecec; border: 1px solid #e5a3a3; color: var(--err); }
+    .notice { background: #eaf6f2; border: 1px solid #8cc9bb;
+      padding: 10px 14px; border-radius: 8px; margin: 12px 0; font-size: .9rem; }
+    .badge { display: inline-block; padding: 5px 10px; border-radius: 999px;
+      font-size: .78rem; font-weight: 700; margin: 0 6px 6px 0; }
+    .badge.engine { background: #eaf6f2; border: 1px solid #8cc9bb; color: var(--ok); }
+    .badge.analysis { background: #e9f1f8; border: 1px solid #9dbed5; color: var(--navy); }
+    .badge.error { background: #fdecec; border: 1px solid #e5a3a3; color: var(--err); }
+    table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+    th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+    th { background: #eaf2f8; color: var(--navy); width: 42%; }
+    td { font-variant-numeric: tabular-nums; }
+    .plot { width: 100%; height: auto; display: block; background: #fbfdff;
+      border: 1px solid var(--line); border-radius: 8px; margin: 10px 0; }
+    .plot-title { font-size: 13px; font-weight: 700; fill: var(--navy); }
+    .grid { stroke: #dbe6ed; stroke-width: 1; }
+    .axis { stroke: #8ba3b4; stroke-width: 1.3; }
+    .tick { font-size: 10px; fill: var(--muted); }
+    .axis-label { font-size: 11px; fill: var(--navy); }
+    .legend { font-size: 10px; fill: var(--ink); }
+    details { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px;
+      margin-top: 12px; background: #fcfdff; font-size: .85rem; }
+    summary { cursor: pointer; font-weight: 700; color: var(--navy); }
+    pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: .8rem;
+      max-height: 300px; overflow: auto; }
+    .warnings { background: #fff4ea; border: 1px solid #e2b68f; color: #714321;
+      border-radius: 8px; padding: 10px 14px; margin-top: 12px; }
+    footer { color: var(--muted); font-size: .82rem; text-align: center; }
+    @media (max-width: 760px) {
+      header { padding: 18px 0 16px; }
+      .card { padding: 15px; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>BJT CE Amplifier Simulator · Lab 04</h1>
+    <p>Voltage-divider common-emitter · real ngspice .op / .ac / .tran · results separated from Lab 03 analytical reference</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <nav aria-label="เมนู">
+    <a href="{{ url_for('index') }}">← Lab 03 DC Bias Calculator</a>
+    <a href="{{ url_for('simulator') }}">Lab 04 Simulator</a>
+    <a href="{{ url_for('simulator', analysis='dc') }}">DC</a>
+    <a href="{{ url_for('simulator', analysis='ac') }}">AC</a>
+    <a href="{{ url_for('simulator', analysis='tran') }}">Transient</a>
+  </nav>
+
+  <section class="card">
+    <h2>1 · Circuit &amp; parameters</h2>
+    <div class="notice">
+      Reference fixture: VCC 12 V · R1 100 kΩ · R2 22 kΩ · RC 2.2 kΩ · RE 1 kΩ ·
+      RL 10 kΩ · Cin = Cout = 10 µF · source 10 mV peak / 1 kHz.
+      RE is <strong>not bypassed</strong> in this baseline.
+    </div>
+    <form method="post" action="{{ url_for('simulate') }}">
+      <div class="grid">
+        <div>
+          <label for="analysis">Analysis mode</label>
+          <select id="analysis" name="analysis">
+            {% for key, label in analysis_labels.items() %}
+            <option value="{{ key }}" {% if analysis == key %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label for="vcc">VCC (V)</label>
+          <input id="vcc" name="vcc" type="number" step="any" value="{{ form.get('vcc', '') }}" required>
+        </div>
+        <div>
+          <label for="beta">Beta (β)</label>
+          <input id="beta" name="beta" type="number" step="any" value="{{ form.get('beta', '') }}" required>
+        </div>
+        <div>
+          <label for="vbe">VBE for analytical ref (V)</label>
+          <input id="vbe" name="vbe" type="number" step="any" value="{{ form.get('vbe', '') }}" required>
+        </div>
+        {% macro resistor(name, label) %}
+        <div>
+          <label for="{{ name }}">{{ label }} (Ω)</label>
+          <div class="field">
+            <input id="{{ name }}" name="{{ name }}" type="number" step="any"
+                   value="{{ form.get(name, '') }}" required>
+            <select name="{{ name }}_unit" aria-label="หน่วย {{ label }}">
+              <option value="ohm" {% if form.get(name ~ '_unit') == 'ohm' %}selected{% endif %}>Ω</option>
+              <option value="kohm" {% if form.get(name ~ '_unit', 'kohm') == 'kohm' %}selected{% endif %}>kΩ</option>
+              <option value="mohm" {% if form.get(name ~ '_unit') == 'mohm' %}selected{% endif %}>MΩ</option>
+            </select>
+          </div>
+        </div>
+        {% endmacro %}
+        {{ resistor('r1', 'R1') }}
+        {{ resistor('r2', 'R2') }}
+        {{ resistor('rc', 'RC') }}
+        {{ resistor('re', 'RE') }}
+        {{ resistor('rl', 'RL') }}
+        <div>
+          <label for="cin">Cin (µF)</label>
+          <input id="cin" name="cin" type="number" step="any" value="{{ form.get('cin', '') }}" required>
+        </div>
+        <div>
+          <label for="cout">Cout (µF)</label>
+          <input id="cout" name="cout" type="number" step="any" value="{{ form.get('cout', '') }}" required>
+        </div>
+        <div>
+          <label for="amp">Source amplitude (V peak)</label>
+          <input id="amp" name="amp" type="number" step="any" value="{{ form.get('amp', '') }}" required>
+        </div>
+        <div>
+          <label for="freq">Source frequency (Hz)</label>
+          <input id="freq" name="freq" type="number" step="any" value="{{ form.get('freq', '') }}" required>
+        </div>
+      </div>
+      <div class="actions">
+        <button type="submit">Run Simulation</button>
+        <span class="hint">ทุกกราฟ/ตัวเลขด้านล่างมาจากการรัน ngspice จริงในรอบนี้ ไม่ใช่ค่าที่ฝังไว้ในโค้ด</span>
+      </div>
+    </form>
+
+    {% if error %}
+    <div class="error"><strong>Error:</strong> {{ error }}</div>
+    {% if spice_log %}
+    <details><summary>ngspice log (error)</summary><pre>{{ spice_log }}</pre></details>
+    {% endif %}
+    {% endif %}
+  </section>
+
+  {% if result %}
+  <section class="card">
+    <h2>2 · Simulation results</h2>
+    <span class="badge engine">Engine: {{ result.engine }}</span>
+    <span class="badge analysis">Analysis: {{ analysis_labels.get(result.analysis, result.analysis) }}</span>
+    <span class="badge engine">Status: Success</span>
+
+    <div class="notice"><strong>Provenance:</strong> {{ result.model }}</div>
+
+    {% if result.analysis == 'dc' %}
+      <h3>DC operating point from ngspice <code>.op</code></h3>
+      <table>
+        <tbody>
+          <tr><th>VB (V)</th><td>{{ '%.5f'|format(result.values.vb) }}</td></tr>
+          <tr><th>VE (V)</th><td>{{ '%.5f'|format(result.values.ve) }}</td></tr>
+          <tr><th>VC (V)</th><td>{{ '%.5f'|format(result.values.vc) }}</td></tr>
+          <tr><th>VCE (V)</th><td>{{ '%.5f'|format(result.values.vce) }}</td></tr>
+          <tr><th>IC (A)</th><td>{{ '%.6g'|format(result.values.ic) }} A
+            ({{ '%.4f'|format(result.values.ic * 1000) }} mA)</td></tr>
+        </tbody>
+      </table>
+
+      {% if analytical %}
+      <h3>Lab 03 analytical reference <span class="hint">(constant β / VBE — different model assumptions)</span></h3>
+      <table>
+        <tbody>
+          <tr><th>IC · analytical</th><td>{{ analytical.ic }}</td></tr>
+          <tr><th>VCE · analytical</th><td>{{ analytical.vce }}</td></tr>
+        </tbody>
+      </table>
+      {% endif %}
+    {% elif result.analysis == 'ac' %}
+      <h3>AC frequency response from ngspice <code>.ac</code></h3>
+      <div class="notice">Vin reference = source node <code>IN</code> before Cin; Vout = node <code>OUT</code> across RL.</div>
+      {{ charts.gain|safe }}
+      {{ charts.phase|safe }}
+      <p class="hint">Peak gain in sweep: {{ '%.2f'|format(result.values.gain_peak_db) }} dB</p>
+      {% if result.values.f_low_3db_hz %}
+      <p class="hint">Lower −3 dB (relative to peak): ≈ {{ '%.4g'|format(result.values.f_low_3db_hz) }} Hz</p>
+      {% endif %}
+      {% if result.values.f_high_3db_hz %}
+      <p class="hint">Upper −3 dB (relative to peak): ≈ {{ '%.4g'|format(result.values.f_high_3db_hz) }} Hz</p>
+      {% else %}
+      <p class="hint">Upper −3 dB point not determined in sweep range (1 Hz – 10 MHz).</p>
+      {% endif %}
+    {% else %}
+      <h3>Transient waveforms from ngspice <code>.tran</code></h3>
+      {{ charts.wave|safe }}
+      <table>
+        <tbody>
+          <tr><th>Vin peak (V)</th><td>{{ '%.6g'|format(result.values.vin_peak_v) }}</td></tr>
+          <tr><th>Vout peak (V)</th><td>{{ '%.6g'|format(result.values.vout_peak_v) }}</td></tr>
+          <tr><th>|Vout/Vin| peak</th><td>{{ '%.4f'|format(result.values.gain_peak_abs) }}</td></tr>
+        </tbody>
+      </table>
+      <p class="hint">In a common-emitter stage with unbypassed RE, Vout should be approximately 180° out of phase with Vin.</p>
+    {% endif %}
+
+    {% if result.warnings %}
+    <div class="warnings">
+      <strong>⚠ Warnings</strong>
+      <ul>{% for warning in result.warnings %}<li>{{ warning }}</li>{% endfor %}</ul>
+    </div>
+    {% endif %}
+
+    <details><summary>Netlist sent to ngspice this run</summary><pre>{{ result.netlist }}</pre></details>
+    <details><summary>ngspice run log</summary><pre>{{ result.log }}</pre></details>
+  </section>
+  {% endif %}
+
+  <footer>
+    Lab 04 · Flask + external ngspice subprocess · no mock traces · DC analytical values are labelled separately.
+  </footer>
+</main>
+</body>
+</html>
