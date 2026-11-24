@@ -18,7 +18,7 @@ All numbers below were read from the live page or from ngspice output produced i
 | **B4 · AC** | Selected `AC frequency response (.ac)` and ran with amplitude 20 mV (source input change also exercised here). | Two real SVG plots rendered from parsed `wrdata`: gain (dB vs log-frequency Hz) and phase (degrees vs log-frequency Hz). Peak gain in sweep 4.86 dB. Lower −3 dB ≈ 1.884 Hz. Upper −3 dB correctly reported as **not determined in sweep range (1 Hz – 10 MHz)**. Phase at 1 kHz ≈ −179.87° from parsed `vp(out) − vp(in)` converted from radians. | `captures/B4_ac_bode.png` | **PASS** |
 | **B5 · Transient** | Selected `Transient waveforms (.tran)` at the specified 10 mV peak / 1 kHz fixture. | Vin/Vout versus time in ms rendered from 2008 parsed points. Vin peak 0.0099999 V, Vout peak 0.0175006 V, \|Vout/Vin\| peak 1.7501. Parsed traces have a negative Vout/Vin slope ratio of −1.74884, confirming the expected common-emitter inversion. | `captures/B5_tran_10mV_1kHz.png` | **PASS** |
 | **B6 · Change Source** | In transient mode, changed amplitude 10 mV → 20 mV and reran. | Vin peak 0.0099999 → 0.0199998 V; Vout peak 0.0175006 → 0.0350252 V; gain stayed ≈ 1.75. The waveform plot changed with the new ngspice run, so it is not hard-coded. | `captures/B5_tran_10mV_1kHz.png` (before), `captures/B6_change_amplitude.png` (after) | **PASS** |
-| **B7 · Invalid / Fail** | Set RE = 0 and submitted. | HTTP 400 error state: **“RE ต้องมากกว่า 0”**. No `Status: Success` badge and no `Simulation results` section were present; the successful prior result was not shown. | `captures/B6_validation_error.png` | **PASS** |
+| **B7 · Invalid / Fail** | Set RE = 0 and submitted. | HTTP 400 error state: **“RE ต้องมากกว่า 0”**. No `Status: Success` badge and no `Simulation results` section were present; the successful prior result was not shown. | `captures/B7_validation_error.png` | **PASS** |
 | **B8 · UI** | Built-in Browser Tool on desktop page, and a 390 px-wide iframe viewport (`captures/phone_frame.html`) rendered by the same Chromium browser. Analysis mode was switched in both sizes. | Desktop: cards, form, plots, units and status readable. 390 px frame: `window.innerWidth = 390`, `.grid` computed to one column (`307px`), button remained readable/tappable (157 px wide), mode selector switched to AC successfully. No essential content was clipped. | `captures/B8_desktop.png`, `captures/B8_mobile_390px_frame.png`, `captures/UI_after_impeccable_desktop.png`, `captures/UI_after_impeccable_mobile_390px.png` | **PASS** |
 
 **B7 limitation:** the “engine not available” variant was not triggered in the browser because ngspice was successfully installed. The adapter code has that error path, but its browser behaviour is **NOT RUN**. B7 is marked PASS from the RE=0 invalid-input branch required by the handout.
@@ -70,8 +70,8 @@ Before/after screenshots are in `captures/B8_desktop.png` → `captures/UI_after
 
 | Item in the handout | This submission | Evidence |
 | --- | --- | --- |
-| GitHub repository URL | <https://github.com/B6830083-Donlatum/B6830083-donlatum> | `git remote -v` |
-| Commit SHA on `main` | Read from `git rev-parse HEAD`; push verified against remote | `git rev-parse HEAD` and `git ls-remote ... refs/heads/main` |
+| GitHub repository URL | <https://github.com/B6830083-Donlatum/B6830083-donlatum> | `git remote -v`; `captures/GitHub_repo_main.png` |
+| Commit SHA on `main` | Read from `git rev-parse HEAD`; push verified against remote | `git rev-parse HEAD`, `git ls-remote ... refs/heads/main`, `captures/GitHub_commit.png` |
 | Lab 03 bias calculator still works (Fixed / Emitter / Divider) | PASS | B1 row above; `captures/B1_lab3_regression.png` |
 | Lab 04 CE reference circuit, ngspice DC / AC / Transient | PASS | B2–B5 rows above; engine version, model, netlist and log are on the results page |
 | Source amplitude / frequency changes rerun the simulation | PASS | B6 row above |
