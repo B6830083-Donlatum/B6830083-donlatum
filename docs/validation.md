@@ -66,6 +66,23 @@ Before/after screenshots are in `captures/B8_desktop.png` → `captures/UI_after
 - The −3 dB search starts after the peak and does not report a crossing when none exists.
 - On invalid input, the template omits the entire results section, preventing a stale Success state.
 
+## Submission checklist (handout)
+
+| Item in the handout | This submission | Evidence |
+| --- | --- | --- |
+| GitHub repository URL | <https://github.com/B6830083-Donlatum/B6830083-donlatum> | `git remote -v` |
+| Commit SHA on `main` | Read from `git rev-parse HEAD`; push verified against remote | `git rev-parse HEAD` and `git ls-remote ... refs/heads/main` |
+| Lab 03 bias calculator still works (Fixed / Emitter / Divider) | PASS | B1 row above; `captures/B1_lab3_regression.png` |
+| Lab 04 CE reference circuit, ngspice DC / AC / Transient | PASS | B2–B5 rows above; engine version, model, netlist and log are on the results page |
+| Source amplitude / frequency changes rerun the simulation | PASS | B6 row above |
+| Bode plot is not mock data | PASS | AC plots are generated from parsed `wrdata`; upper −3 dB is reported as not determined instead of invented |
+| Impeccable used, screenshots from a real browser | PASS | Impeccable section above; `captures/UI_after_impeccable_*.png` |
+| B1–B8 recorded with browser evidence | PASS with one substitution | Built-in Browser Tool (Chromium), **not Playwright MCP** — Playwright MCP was not exposed in this session |
+| README + dependency list + steps to run | PASS | `README.md`, `requirements.txt`, ngspice install instructions and `Reproduce` below |
+| No `.venv/`, `.env/`, API key or token committed | PASS | `git ls-files` contains 29 project files and none of those paths/secrets |
+
+The rubric totals are deliberately not rewritten as a claim; the table records what was actually executed and what was not. The only explicitly **NOT RUN** browser variant is the “ngspice engine unavailable” branch of B7, because ngspice was present and working.
+
 ## Reproduce
 
 ```powershell
